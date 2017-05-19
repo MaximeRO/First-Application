@@ -1,0 +1,191 @@
+
+from turtle import *
+from datetime import datetime
+import time
+from math import *
+
+
+#................
+def jump(distance, angle=0):
+    penup()
+    # Lève le stylo
+
+    right(angle)
+    # Tourner à droite, définit angle de départ de l'aiguille
+
+    forward(distance)
+    # Avancer d'une distance donnée, détermine la position de l'ensemble du cercle constituant l'horloge sur l'écran
+
+    left(angle)
+    # Tourner à gauche, définit angle de départ de l'aiguille
+
+    pendown()
+    # Poser le stylo
+
+
+#......................
+def hand(longueur, hauteur): #Aiguille
+
+    forward(longueur*1.15)
+    # Taille du corps de l'aiguille
+
+    right(90)
+    # Angle entre le bas de la tête de l'aiguille et du corps de l'aiguille
+
+    forward(hauteur/2.0)
+    # Epaisseur de l'aiguille
+
+    left(120)
+    # Angle entre le bas de la tête de l'aiguille et du corps de l'aiguille
+
+    forward(hauteur)
+    left(120)
+    forward(hauteur)
+    left(120)
+    forward(hauteur/2.0)
+    
+
+# Définit la pointe de l'aguille
+def make_hand_shape(name, longueur, hauteur):
+
+    reset()
+    # Efface l'écran
+
+    jump(-longueur*0.15)
+    # définit la position des aiguilles dans l'espace
+
+    begin_poly()
+    # Commence à enregistrer les sommets d'un polygone, la position de turtle est un sommet d'un polygone.
+    hand(longueur, hauteur)
+    # Définit la longueur de l'aiguille et de la tête de l'aiguille
+
+    end_poly()
+    # Stoppe l'enregistrement
+
+    hand_form = get_poly()
+    # Retourne le dernier polygone enregistré
+
+    register_shape(name, hand_form)
+
+def clockface(radian): #L'image de l'horloge avec les points
+    reset()
+    # Efface ce qui est entrain d'être dessiné, re-centre la fenêtre de dessin, remet les valeurs par défauts.
+    
+    pensize(7)
+    # Définit la taille des batonnets
+    
+    for i in range(60):
+        jump(radian)
+        if i % 5 == 0:
+            forward(25)
+            jump(-radian-25)
+        else:
+            dot(3)
+            jump(-radian)
+        right(6)
+    # Boucle qui permet de définir la position des différents batonnêts présents toutes les 5 minutes sur une horloge
+
+def setup():
+    global dixsecond_hand, second_hand, minute_hand, writer
+    mode("logo")
+    make_hand_shape("dixsecond_hand", 125, 25)  #
+    make_hand_shape("second_hand",  130, 25)
+    make_hand_shape("minute_hand", 90, 25)
+    # Définit les  trois aiguilles
+    
+
+    clockface(160)                              
+    # Définit la taille de l'horloge
+    
+    dixsecond_hand = Turtle()
+    dixsecond_hand.shape("dixsecond_hand")      
+    dixsecond_hand.color("gray20", "gray80")
+    # Définit les caractéristiques de l'aiguille des dixièmes de secondes.
+    
+    second_hand = Turtle()                     
+    second_hand.shape("second_hand")
+    second_hand.color("blue1", "red1")
+    # Définit les caractéristiques de l'aiguille des secondes.
+    
+    minute_hand = Turtle()                      
+    minute_hand.shape("minute_hand")
+    minute_hand.color("blue3", "red3")
+    # Définit les caractéristiques de l'aiguille des minutes.
+    
+    for hand in second_hand, minute_hand, dixsecond_hand:
+        hand.resizemode("user")
+        hand.shapesize(1, 1, 3)
+        hand.speed(1)                           
+    #Définit le temps que met l'aiguille à aller d'une pos 1 à une pos 2
+   
+    ht()
+    writer = Turtle()
+    #writer.mode("logo")
+    
+    writer.ht()
+    writer.pu()
+    writer.bk(85)
+
+
+def tock():
+    sec = 0
+    min = 0
+    dixsecfinal = 0
+    dixsec = 0
+    while dixsecfinal < 9:
+        time.sleep(0.1)
+        dixsec = dixsec + 1
+        sec = sec + 0.1
+        min = min + (0.1/60)
+        secfinal = round(sec)
+        minfinal = floor(min)
+        if dixsec > 9:
+            dixsec = 0
+        elif sec > 59:
+            sec = 0
+        print(minfinal, ":", secfinal, ":", dixsec)
+    # Boucle définissant le chronomètre
+        
+        try:
+            tracer(False)
+            writer.forward(65)
+            writer.forward(85)
+            tracer(True)
+            
+            dixsecond_hand.setheading(6*dixsec)
+            second_hand.setheading(10*secfinal)
+            minute_hand.setheading(10*minfinal)
+            # Définition du mouvement des aiguilles en fonction des valeurs retournées par le chronomètre
+            
+            tracer(True)
+            ontimer(tock, 100)                        
+            #Appelle la fonction tous les 1/10e sec
+        
+        except Terminator:                          
+            break
+        # Terminator permet normalement de quitter l'application, nous n'avons malheuresement pas eu le temps de la finir, elle n'est pas encore fonctionnelle.
+
+
+
+def main():
+    tracer(False)
+    print()
+    setup()
+    #définit la taille de la fenêtre principale
+    tracer()
+    tock()
+    return "Programme tourne correctement"
+
+
+if __name__ == "__main__":
+    mode("logo")
+    msg = main()
+    print(msg)
+    mainloop()
+
+
+
+
+
+
+
